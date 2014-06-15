@@ -38,11 +38,8 @@ def get_tag(args):
     log.info("Starting DB.")
     tagdb = TagDB()
     log.info("Getting paths.")
-    tagString = tagdb.get(args.tags)
-    log.debug("Raw value is: {}".format(tagString))
-    log.info("Parsing value string.")
-    tagList = yaml.load(tagString.fromMaybe(""))
-    log.debug("Parsed values are: {}".format(tagList))
+    tagSet = tagdb.get(args.tags)
+    log.debug("Parsed values are: {}".format(tagSet))
 
 def set_tag(args):
     '''
@@ -149,7 +146,7 @@ class TagDB:
         try:
             with open(hashFile) as value:
                 log.debug("Reading key now.")
-                return Just(value.read())
+                return Just(set(yaml.load(value.read())))
         except FileNotFoundError:
             return Nothing()
 
