@@ -117,6 +117,9 @@ class Just(Maybe):
     def bind(self, func):
         func(self.arg)
 
+    def __str__(self):
+        return "Just {}".format(self.arg)
+
 class Nothing(Maybe):
     def __init__(self):
         ''' Do nothing '''
@@ -126,6 +129,9 @@ class Nothing(Maybe):
     def bind(self, func):
         ''' Do nothing '''
         return Nothing()
+
+    def __str__(self):
+        return "Nothing"
 
 class TagDB:
     def __init__(self, tagFolder=""):
