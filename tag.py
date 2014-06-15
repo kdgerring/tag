@@ -8,10 +8,13 @@ import yaml
 import os
 import hashlib
 
-if os.name is 'nt':
-    appdata = os.path.join(os.environ['LOCALAPPDATA'],'tags')
-else:
-    appdata = os.path.join(os.environ['HOME'],'.tags')
+try:
+    appdata = os.environ['TAGDIR']
+except KeyError:
+    if os.name is 'nt':
+        appdata = os.path.join(os.environ['LOCALAPPDATA'],'tags')
+    else:
+        appdata = os.path.join(os.environ['HOME'],'.tags')
 
 
 def list_tag(args):
