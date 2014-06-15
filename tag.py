@@ -6,6 +6,7 @@ import argparse
 import logging
 import yaml
 import os
+import re
 import hashlib
 
 try:
@@ -52,6 +53,14 @@ def set_tag(args):
     log = logging.getLogger("set")
     log.info("Called set")
     log.info("Setting tags for file {} to: {}".format(file_name, tag_list))
+    log.info("Starting DB.")
+    tabdb = TagDB()
+    log.info("Getting file name.")
+    fileName = args.file
+    log.debug("File name is: {}.".format(fileName))
+    log.info("Getting tag list.")
+    tagList = args.tags
+    log.debug("Tag list is: {}.".format(tagList))
 
 class Maybe:
     def pure(self, arg):
