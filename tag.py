@@ -46,7 +46,7 @@ def set_tag(args):
     This function is used to process command lines for setting tags on files.
     '''
     def go(tags):
-        return tags.union(addTags).difference(remTags)
+        return Just(tags.union(addTags).difference(remTags))
     file_name = args.file
     tag_list = args.tags
     log = logging.getLogger("set")
