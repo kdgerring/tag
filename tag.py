@@ -40,6 +40,8 @@ def get_tag(args):
     tagString = tagdb.get(args.tags)
     log.debug("Raw value is: {}".format(tagString))
     log.info("Parsing value string.")
+    tagList = yaml.load(tagString.fromMaybe(""))
+    log.debug("Parsed values are: {}".format(tagList))
 
 def set_tag(args):
     '''
