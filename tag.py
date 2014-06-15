@@ -53,19 +53,19 @@ def set_tag(args):
 
 class Maybe:
     def pure(self, arg):
-        if isInstance(self, Just):
+        if isinstance(self, Just):
             return Just(arg)
         else:
             return Nothing()
 
     def bind(self, func):
-        if isInstance(self, Just):
+        if isinstance(self, Just):
             return self.bind(func)
         else:
             return Nothing()
 
     def fromMaybe(self, default):
-        if isInstance(self, Just):
+        if isinstance(self, Just):
             return self.arg
         else:
             return default
