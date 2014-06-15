@@ -73,19 +73,19 @@ def set_tag(args):
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
-    mandatories = []
-    discretionals = []
-    excluded = []
+    mandatories = set()
+    discretionals = set()
+    excluded = set()
     for tag in tagList:
         match = re.match("^\+(.*)$", tag)
         if match:
-            mandatories.append(match.group(1))
+            mandatories.add(match.group(1))
         else:
             match = re.match("^\-(.*)$", tag)
             if match:
-                excluded.append(match.group(1))
+                excluded.add(match.group(1))
             else:
-                discretionals.append(tag)
+                discretionals.add(tag)
     return (mandatories,discretionals,excluded)
 
 class Maybe:
