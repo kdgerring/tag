@@ -116,8 +116,10 @@ class Nothing(Maybe):
         ''' Do nothing '''
     def pure(self, arg):
         ''' Do nothing '''
+        return Nothing()
     def bind(self, func):
         ''' Do nothing '''
+        return Nothing()
 
 class TagDB:
     def __init__(self, tagFolder=""):
