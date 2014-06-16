@@ -99,17 +99,9 @@ def process(tagList):
 
 class Maybe:
     def pure(self, arg):
-        if isinstance(self, Just):
-            return Just(arg)
-        else:
-            return Nothing()
-
+        return NotImplemented
     def bind(self, func):
-        if isinstance(self, Just):
-            return self.bind(func)
-        else:
-            return Nothing()
-
+        return NotImplemented
     def fromMaybe(self, default):
         if isinstance(self, Just):
             return self.arg
@@ -124,7 +116,7 @@ class Just(Maybe):
         self.arg = arg
 
     def bind(self, func):
-        func(self.arg)
+        return func(self.arg)
 
     def __str__(self):
         return "Just {}".format(self.arg)
