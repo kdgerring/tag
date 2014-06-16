@@ -82,6 +82,20 @@ def set_tag(args):
     log.debug("New tags are: {}.".format(newTags))
     log.info("Setting {}'s new tags.".format(file_name))
     tagdb.set(file_name, yaml.dump(newTags.fromMaybe(addTags)))
+    def remOld(tags):
+        for tag in tags:
+            nameSet = tagdb.get(tag).bind(lambda nameSet: nameSet - set(file_name))
+            log.debug("Modified nameSet is: {}".format(nameSet))
+            tagdb.set(tag,nameSet.fromMaybe(""))
+    log.info("Removing file from old tags.")
+    oldTags.bind(remOld)
+    def addNew(tags):
+        for tag in tags:
+            nameSet = tagdb.get(tag).bind(lambda nameSet: nameSet | set(file_name))
+            log.debug("Modified nameSet is: {}".format(nameSet))
+            tagdb.set(tag,nameSet.fromMaybe(""))
+    log.info("Adding file to new tags.")
+    newTags.bind(addNew)
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
