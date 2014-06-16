@@ -45,6 +45,8 @@ def get_tag(args):
         return Just(tagSet.union(tagdb.get(tag)))
     tagSet = reduce(lambda x, y: y.bind(go(x)), tag_list)
     log.debug("Parsed values are: {}".format(tagSet))
+    for tag in tagSet.fromMaybe(set()):
+        print(tag)
 
 def set_tag(args):
     '''
