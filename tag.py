@@ -25,28 +25,30 @@ def list_tag(args):
     This function is used to process command lines for listing tags.
     '''
     file_name = args.file
-    log = logging.getLogger("tags")
-    log.info("Called tags")
+    log = logging.getLogger("get")
+    log.info("Called get")
     log.info("Getting tags for {}".format(file_name))
+    log.info("Starting DB.")
+    tagdb = TagDB()
+    log.info("Getting tags.")
+    tag_set = tagdb.get(file_name)
+    log.debug("Parsed values are: {}".format(tag_set))
+    for tag in tag_set.fromMaybe(set()):
+        print(tag)
 
 def get_tag(args):
     '''
     This function is used to process command lines for listing files.
     '''
     tag_list = args.tags
-    log = logging.getLogger("get")
-    log.info("Called get")
-    log.info("Getting files for {}".format(tag_list))
+    log = logging.getLogger("tags")
+    log.info("Called tags")
+    log.info("Getting paths for expression {}".format(tag_list))
     log.info("Starting DB.")
     tagdb = TagDB()
-    log.info("Getting paths.")
-    tag_list = map(lambda x: tagdb.get(x),tag_list)
-    def go(tagSet):
-        return Just(tagSet.union(tagdb.get(tag)))
-    tagSet = reduce(lambda x, y: y.bind(go(x)), tag_list)
-    log.debug("Parsed values are: {}".format(tagSet))
-    for tag in tagSet.fromMaybe(set()):
-        print(tag)
+    file_set = map(lambda x: tagdb.get(x).fromMaybe(set()),tag_list)
+    file_set = reduce(lambda x, y: x | y,file_set)
+    log.debug("Raw file list is: {}".format(file_set))
 
 def set_tag(args):
     '''
