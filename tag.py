@@ -183,6 +183,7 @@ class TagDB:
         log.debug("Key path is: {}.".format(hashFile))
         log.debug("Value is: {}".format(value)) # Probably very noisy!
         log.debug("Ensuring that tag dir exists.")
+        os.makedirs(self.tagFolder,exist_ok=True)
         log.debug("Trying to create/overwrite corresponding file.")
         with open(hashFile, mode="w") as valueFile:
             log.debug("Writing key now")
