@@ -9,6 +9,8 @@ import os
 import re
 import hashlib
 
+from functools import reduce
+
 try:
     appdata = os.environ['TAGDIR']
 except KeyError:
@@ -38,7 +40,10 @@ def get_tag(args):
     log.info("Starting DB.")
     tagdb = TagDB()
     log.info("Getting paths.")
-    tagSet = tagdb.get(args.tags)
+    tag_list = map(lambda x: tagdb.get(x),tag_list)
+    def go(tagSet):
+        return Just(tagSet.union(tagdb.get(tag)))
+    tagSet = reduce(lambda x, y: y.bind(go(x)), tag_list)
     log.debug("Parsed values are: {}".format(tagSet))
 
 def set_tag(args):
@@ -70,6 +75,8 @@ def set_tag(args):
     log.debug("Old tags are: {}.".format(oldTags))
     newTags = (oldTags.bind(go)).fromMaybe(addTags)
     log.debug("New tags are: {}.".format(newTags))
+    log.info("Setting {}'s new tags.".format(file_name))
+    tagdb.set(file_name, yaml.dump(newTags))
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
