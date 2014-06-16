@@ -110,6 +110,9 @@ class Maybe:
             return self.arg
         else:
             return default
+    def liftM2(self,f,m2):
+        '''Lift a two-argument function, with self as first argument, into the Maybe monad.'''
+        return self.bind(lambda x: m2.bind(lambda y: Just(f(x,y))))
 
 class Just(Maybe):
     def __init__(self, arg):
