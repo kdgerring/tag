@@ -163,6 +163,7 @@ class TagDB:
         Given a key, retrieve the corresponding value from the object DB.
         '''
         log = logging.getLogger(__name__)
+        log.debug("Key is: {}.".format(key))
         hashFile = self.__keyToFile(key)
         log.debug("Trying to read corresponding file.")
         try:
@@ -177,8 +178,11 @@ class TagDB:
         Given a key and value, set the value according to the key in the object DB.
         '''
         log = logging.getLogger(__name__)
-        hashFile = self.__keyToValue(key)
+        hashFile = self.__keyToFile(key)
+        log.debug("Key is: {}.".format(key))
+        log.debug("Key path is: {}.".format(hashFile))
         log.debug("Value is: {}".format(value)) # Probably very noisy!
+        log.debug("Ensuring that tag dir exists.")
         log.debug("Trying to create/overwrite corresponding file.")
         with open(hashFile, mode="w") as valueFile:
             log.debug("Writing key now")
