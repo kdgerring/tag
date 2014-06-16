@@ -53,7 +53,7 @@ def set_tag(args):
     This function is used to process command lines for setting tags on files.
     '''
     def go(tags):
-        return Just(tags.union(addTags).difference(remTags))
+        return Just((tags | addTags) - remTags)
     file_name = args.file
     tag_list = args.tags
     log = logging.getLogger("set")
@@ -69,16 +69,17 @@ def set_tag(args):
     log.debug("Tag list is: {}.".format(tagList))
     log.info("Processing tag list expression.")
     (m,d,e) = process(tagList)
-    addTags = m | d - e
+    addTags = (m | d) - e
     remTags = e
     log.debug("Tags to add are: {}.".format(addTags))
     log.debug("Tags to remove are: {}.".format(remTags))
     oldTags = tagdb.get(file_name)
     log.debug("Old tags are: {}.".format(oldTags))
-    newTags = (oldTags.bind(go)).fromMaybe(addTags)
+    newTags = oldTags.bind(go)
+    assert(newTags is not None)
     log.debug("New tags are: {}.".format(newTags))
     log.info("Setting {}'s new tags.".format(file_name))
-    tagdb.set(file_name, yaml.dump(newTags))
+    tagdb.set(file_name, yaml.dump(newTags.fromMaybe(addTags)))
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
