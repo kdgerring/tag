@@ -62,7 +62,7 @@ def set_tag(args):
     log.debug("Tag list is: {}.".format(tagList))
     log.info("Processing tag list expression.")
     (m,d,e) = process(tagList)
-    addTags = m.union(d).difference(e)
+    addTags = m | d - e
     remTags = e
     log.debug("Tags to add are: {}.".format(addTags))
     log.debug("Tags to remove are: {}.".format(remTags))
