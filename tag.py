@@ -188,7 +188,11 @@ class TagDB:
         try:
             with open(hashFile) as value:
                 log.debug("Reading key now.")
-                return Just(set(yaml.load(value.read())))
+                yamlData = yaml.load(value.read())
+                if yamlData is not None:
+                    return Just(set(yamlData))
+                else:
+                    return Nothing()
         except FileNotFoundError:
             return Nothing()
 
