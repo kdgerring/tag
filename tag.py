@@ -49,6 +49,8 @@ def get_tag(args):
     file_set = map(lambda x: tagdb.get(x).fromMaybe(set()),tag_list)
     file_set = reduce(lambda x, y: x | y,file_set)
     log.debug("Raw file list is: {}".format(file_set))
+    for fileName in file_set:
+        print(fileName)
 
 def set_tag(args):
     '''
