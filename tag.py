@@ -25,8 +25,8 @@ def list_tag(args):
     This function is used to process command lines for listing tags.
     '''
     file_name = args.file
-    log = logging.getLogger("get")
-    log.info("Called get")
+    log = logging.getLogger("tags")
+    log.info("Called tags")
     log.info("Getting tags for {}".format(file_name))
     log.info("Starting DB.")
     tagdb = TagDB()
@@ -41,8 +41,8 @@ def get_tag(args):
     This function is used to process command lines for listing files.
     '''
     tag_list = args.tags
-    log = logging.getLogger("tags")
-    log.info("Called tags")
+    log = logging.getLogger("get")
+    log.info("Called get")
     log.info("Getting paths for expression {}".format(tag_list))
     log.info("Starting DB.")
     tagdb = TagDB()
