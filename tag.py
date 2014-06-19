@@ -77,27 +77,22 @@ def set_tag(args):
     remTags = e
     log.debug("Tags to add are: {}.".format(addTags))
     log.debug("Tags to remove are: {}.".format(remTags))
-    oldTags = tagdb.get(file_name)
+    oldTags = tagdb.get(fileName).fromMaybe(set())
     log.debug("Old tags are: {}.".format(oldTags))
-    newTags = oldTags.bind(go)
+    newTags = (oldTags | addTags) - remTags
     assert(newTags is not None)
     log.debug("New tags are: {}.".format(newTags))
-    log.info("Setting {}'s new tags.".format(file_name))
-    tagdb.set(file_name, yaml.dump(newTags.fromMaybe(addTags)))
-    def remOld(tags):
-        for tag in tags:
-            nameSet = tagdb.get(tag).bind(lambda nameSet: nameSet - set(file_name))
-            log.debug("Modified nameSet is: {}".format(nameSet))
-            tagdb.set(tag,nameSet.fromMaybe(""))
-    log.info("Removing file from old tags.")
-    oldTags.bind(remOld)
-    def addNew(tags):
-        for tag in tags:
-            nameSet = tagdb.get(tag).bind(lambda nameSet: nameSet | set(file_name))
-            log.debug("Modified nameSet is: {}".format(nameSet))
-            tagdb.set(tag,nameSet.fromMaybe(""))
-    log.info("Adding file to new tags.")
-    newTags.bind(addNew)
+    log.info("Setting {}'s new tags.".format(fileName))
+    for tag in oldTags:
+        log.debug("Removing path from tag: {}.".format(tag))
+        tagData = tagdb.get(tag).fromMaybe(set())
+        tagdb.set(tag,tagData - set([fileName]))
+    for tag in newTags:
+        log.debug("Setting tag: {} to include path.".format(tag))
+        tagData = tagdb.get(tag).fromMaybe(set())
+        tagdb.set(tag,tagData | set([fileName]))
+    log.debug("Setting file {} to point to tags.".format(fileName))
+    tagdb.set(fileName, newTags)
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
