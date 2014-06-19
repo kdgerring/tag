@@ -56,13 +56,8 @@ def set_tag(args):
     '''
     This function is used to process command lines for setting tags on files.
     '''
-    def go(tags):
-        return Just((tags | addTags) - remTags)
-    file_name = args.file
-    tag_list = args.tags
     log = logging.getLogger("set")
     log.info("Called set")
-    log.info("Setting tags for file {} to: {}".format(file_name, tag_list))
     log.info("Starting DB.")
     tagdb = TagDB()
     log.info("Getting file name.")
