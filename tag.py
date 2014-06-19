@@ -180,7 +180,10 @@ class TagDB:
         try:
             with open(hashFile) as value:
                 log.debug("Reading key now.")
-                yamlData = yaml.load(value.read())
+                yamlData = value.read()
+                log.debug("Raw string is: {}".format(yamlData))
+                yamlData = yaml.load(yamlData)
+                log.debug("Parsed data string is: {}".format(yamlData))
                 if yamlData is not None:
                     return Just(set(yamlData))
                 else:
@@ -201,6 +204,9 @@ class TagDB:
         os.makedirs(self.tagFolder,exist_ok=True)
         log.debug("Trying to create/overwrite corresponding file.")
         with open(hashFile, mode="w") as valueFile:
+            log.debug("Item to write is: {}".format(value))
+            value = yaml.dump(value)
+            log.debug("Serialized item is: {}".format(value))
             log.debug("Writing key now")
             valueFile.write(value)
 
