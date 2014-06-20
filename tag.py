@@ -30,8 +30,10 @@ def list_tag(args):
     log.info("Getting tags for {}".format(file_name))
     log.info("Starting DB.")
     tagdb = TagDB()
+    log.info("Reading file contents to compute SHA hash.")
+    hashData = hashFile(file_name)
     log.info("Getting tags.")
-    tag_set = tagdb.get(file_name)
+    tag_set = tagdb.get(hashData)
     log.debug("Parsed values are: {}".format(tag_set))
     for tag in tag_set.fromMaybe(set()):
         print(tag)
@@ -63,6 +65,8 @@ def set_tag(args):
     log.info("Getting file name.")
     fileName = args.file
     log.debug("File name is: {}.".format(fileName))
+    hashData = hashFile(fileName)
+    log.debug("File hash is: {}.".format(hashData))
     log.info("Getting tag list.")
     tagList = args.tags
     log.debug("Tag list is: {}.".format(tagList))
@@ -72,22 +76,22 @@ def set_tag(args):
     remTags = e
     log.debug("Tags to add are: {}.".format(addTags))
     log.debug("Tags to remove are: {}.".format(remTags))
-    oldTags = tagdb.get(fileName).fromMaybe(set())
+    oldTags = tagdb.get(hashData).fromMaybe(set())
     log.debug("Old tags are: {}.".format(oldTags))
     newTags = (oldTags | addTags) - remTags
     assert(newTags is not None)
     log.debug("New tags are: {}.".format(newTags))
-    log.info("Setting {}'s new tags.".format(fileName))
+    log.info("Setting {}'s new tags.".format(hashData))
     for tag in oldTags:
         log.debug("Removing path from tag: {}.".format(tag))
         tagData = tagdb.get(tag).fromMaybe(set())
-        tagdb.set(tag,tagData - set([fileName]))
+        tagdb.set(tag,tagData - set([hashData]))
     for tag in newTags:
         log.debug("Setting tag: {} to include path.".format(tag))
         tagData = tagdb.get(tag).fromMaybe(set())
-        tagdb.set(tag,tagData | set([fileName]))
-    log.debug("Setting file {} to point to tags.".format(fileName))
-    tagdb.set(fileName, newTags)
+        tagdb.set(tag,tagData | set([hashData]))
+    log.debug("Setting file {} to point to tags.".format(hashData))
+    tagdb.set(hashData, newTags)
 
 def process(tagList):
     '''Given a list of tag expressions, return a triple of lists: (mandatory tags, discretional tags, excluded tags).'''
@@ -105,6 +109,19 @@ def process(tagList):
             else:
                 discretionals.add(tag)
     return (mandatories,discretionals,excluded)
+
+def hashFile(fileName):
+    '''Given a path to a file, return the SHA256 of its contents.'''
+    log = logging.getLogger("hashFile")
+    log.debug("Hashing file name: {}".format(fileName))
+    hashData = hashlib.sha256()
+    with open(fileName) as f:
+        for line in f:
+            hashData.update(line.encode())
+    hashData = hashData.hexdigest()
+    log.debug("Hash is: {}".format(hashData))
+    return hashData
+
 
 class Maybe:
     def pure(self, arg):
