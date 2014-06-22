@@ -123,50 +123,6 @@ def hashFile(fileName):
     return hashData
 
 
-class Maybe:
-    def pure(self, arg):
-        return NotImplemented
-    def bind(self, func):
-        return NotImplemented
-    def fromMaybe(self, default):
-        return NotImplemented
-    def liftM2(self,f,m2):
-        '''Lift a two-argument function, with self as first argument, into the Maybe monad.'''
-        return self.bind(lambda x: m2.bind(lambda y: Just(f(x,y))))
-
-class Just(Maybe):
-    def __init__(self, arg):
-        self.arg = arg
-
-    def pure(self, arg):
-        self.arg = arg
-
-    def bind(self, func):
-        return func(self.arg)
-
-    def fromMaybe(self, default):
-        return self.arg
-
-    def __str__(self):
-        return "Just {}".format(self.arg)
-
-class Nothing(Maybe):
-    def __init__(self):
-        ''' Do nothing '''
-
-    def pure(self, arg):
-        ''' Do nothing '''
-        return Nothing()
-
-    def bind(self, func):
-        ''' Do nothing '''
-        return Nothing()
-
-    def fromMaybe(self, default):
-        return default
-
-    def __str__(self):
-        return "Nothing"
 
 class TagDB:
     def __init__(self, tagFolder=""):
