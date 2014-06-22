@@ -8,6 +8,7 @@ import yaml
 import os
 import re
 import hashlib
+from Monads.Maybe import *
 
 from functools import reduce
 
@@ -121,8 +122,6 @@ def hashFile(fileName):
     hashData = hashData.hexdigest()
     log.debug("Hash is: {}".format(hashData))
     return hashData
-
-
 
 class TagDB:
     def __init__(self, tagFolder=""):
