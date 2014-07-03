@@ -4,21 +4,13 @@
 
 import argparse
 import logging
-import yaml
-import os
 import re
 import hashlib
 
+from Monads.Maybe import *
+from TagDB.TagDB import *
+
 from functools import reduce
-
-try:
-    appdata = os.environ['TAGDIR']
-except KeyError:
-    if os.name is 'nt':
-        appdata = os.path.join(os.environ['LOCALAPPDATA'],'tags')
-    else:
-        appdata = os.path.join(os.environ['HOME'],'.tags')
-
 
 def list_tag(args):
     '''
@@ -121,111 +113,6 @@ def hashFile(fileName):
     hashData = hashData.hexdigest()
     log.debug("Hash is: {}".format(hashData))
     return hashData
-
-
-class Maybe:
-    def pure(self, arg):
-        return NotImplemented
-    def bind(self, func):
-        return NotImplemented
-    def fromMaybe(self, default):
-        return NotImplemented
-    def liftM2(self,f,m2):
-        '''Lift a two-argument function, with self as first argument, into the Maybe monad.'''
-        return self.bind(lambda x: m2.bind(lambda y: Just(f(x,y))))
-
-class Just(Maybe):
-    def __init__(self, arg):
-        self.arg = arg
-
-    def pure(self, arg):
-        self.arg = arg
-
-    def bind(self, func):
-        return func(self.arg)
-
-    def fromMaybe(self, default):
-        return self.arg
-
-    def __str__(self):
-        return "Just {}".format(self.arg)
-
-class Nothing(Maybe):
-    def __init__(self):
-        ''' Do nothing '''
-
-    def pure(self, arg):
-        ''' Do nothing '''
-        return Nothing()
-
-    def bind(self, func):
-        ''' Do nothing '''
-        return Nothing()
-
-    def fromMaybe(self, default):
-        return default
-
-    def __str__(self):
-        return "Nothing"
-
-class TagDB:
-    def __init__(self, tagFolder=""):
-        if tagFolder is "":
-            self.tagFolder = appdata
-        else:
-            self.tagFolder = tagFolder
-
-    def __keyToFile(self, key):
-        '''
-        Given a key, return a correct hash of that key.
-        '''
-        log = logging.getLogger(__name__)
-        log.debug("DB folder is: {}.".format(self.tagFolder))
-        hashKey = hashlib.sha256(str(key).encode()).hexdigest()
-        log.debug("Key is: {}.".format(key))
-        log.debug("Hashed key is: {}.".format(hashKey))
-        return os.path.join(self.tagFolder, hashKey)
-
-    def get(self, key):
-        '''
-        Given a key, retrieve the corresponding value from the object DB.
-        '''
-        log = logging.getLogger(__name__)
-        log.debug("Key is: {}.".format(key))
-        hashFile = self.__keyToFile(key)
-        log.debug("Trying to read corresponding file.")
-        try:
-            with open(hashFile) as value:
-                log.debug("Reading key now.")
-                yamlData = value.read()
-                log.debug("Raw string is: {}".format(yamlData))
-                yamlData = yaml.load(yamlData)
-                log.debug("Parsed data string is: {}".format(yamlData))
-                if yamlData is not None:
-                    return Just(set(yamlData))
-                else:
-                    return Nothing()
-        except FileNotFoundError:
-            return Nothing()
-
-    def set(self, key, value):
-        '''
-        Given a key and value, set the value according to the key in the object DB.
-        '''
-        log = logging.getLogger(__name__)
-        hashFile = self.__keyToFile(key)
-        log.debug("Key is: {}.".format(key))
-        log.debug("Key path is: {}.".format(hashFile))
-        log.debug("Value is: {}".format(value)) # Probably very noisy!
-        log.debug("Ensuring that tag dir exists.")
-        os.makedirs(self.tagFolder,exist_ok=True)
-        log.debug("Trying to create/overwrite corresponding file.")
-        with open(hashFile, mode="w") as valueFile:
-            log.debug("Item to write is: {}".format(value))
-            value = yaml.dump(value)
-            log.debug("Serialized item is: {}".format(value))
-            log.debug("Writing key now")
-            valueFile.write(value)
 
 def parser(log):
     parser = argparse.ArgumentParser(description="A program that tags arbitrary files with arbitrary strings.")
